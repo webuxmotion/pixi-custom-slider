@@ -54315,24 +54315,39 @@ var Sketch = /*#__PURE__*/function () {
     });
     document.body.appendChild(this.app.view);
     this.margin = 50;
+    this.scroll = 0;
+    this.scrollTarget = 0;
     this.width = (window.innerWidth - 2 * this.margin) / 3;
     this.height = window.innerHeight * 0.8;
     this.container = new PIXI.Container();
     this.app.stage.addChild(this.container);
     this.images = [_.default, _2.default, _3.default, _4.default];
+    this.thumbs = [];
+    this.wholewidth = this.images.length * (this.width + this.margin);
     (0, _loadImages.default)(this.images, function (images) {
       _this.loadImages = images;
 
       _this.add();
 
       _this.render();
+
+      _this.scrollEvent();
     });
   }
 
   _createClass(Sketch, [{
+    key: "scrollEvent",
+    value: function scrollEvent() {
+      var _this2 = this;
+
+      document.addEventListener('mousewheel', function (e) {
+        _this2.scrollTarget = e.wheelDelta / 3;
+      });
+    }
+  }, {
     key: "add",
     value: function add() {
-      var _this2 = this;
+      var _this3 = this;
 
       var parent = {
         w: this.width,
@@ -54344,8 +54359,8 @@ var Sketch = /*#__PURE__*/function () {
         var container = new PIXI.Container();
         var spriteContainer = new PIXI.Container();
         var mask = new PIXI.Sprite(PIXI.Texture.WHITE);
-        mask.width = _this2.width;
-        mask.height = _this2.height;
+        mask.width = _this3.width;
+        mask.height = _this3.height;
         sprite.mask = mask;
         sprite.anchor.set(0.5);
         sprite.position.set(sprite.texture.orig.width / 2, sprite.texture.orig.height / 2);
@@ -54356,16 +54371,18 @@ var Sketch = /*#__PURE__*/function () {
         var cover = (0, _mathFit.default)(image, parent);
         spriteContainer.position.set(cover.left, cover.top);
         spriteContainer.scale.set(cover.scale, cover.scale);
-        container.x = (_this2.margin + _this2.width) * i;
-        container.y = _this2.height / 10;
+        container.x = (_this3.margin + _this3.width) * i;
+        container.y = _this3.height / 10;
         spriteContainer.addChild(sprite);
         container.interactive = true;
-        container.on('mouseover', _this2.mouseOn);
-        container.on('mouseout', _this2.mouseOut);
+        container.on('mouseover', _this3.mouseOn);
+        container.on('mouseout', _this3.mouseOut);
         container.addChild(spriteContainer);
         container.addChild(mask);
 
-        _this2.container.addChild(container);
+        _this3.container.addChild(container);
+
+        _this3.thumbs.push(container);
       });
     }
   }, {
@@ -54391,12 +54408,25 @@ var Sketch = /*#__PURE__*/function () {
       });
     }
   }, {
+    key: "calcPos",
+    value: function calcPos(scroll, pos) {
+      var temp = (scroll + pos + this.wholewidth + this.width + this.margin) % this.wholewidth - this.width - this.margin;
+      return temp;
+    }
+  }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.app.ticker.add(function () {
-        _this3.app.renderer.render(_this3.container);
+        _this4.app.renderer.render(_this4.container);
+
+        _this4.scroll -= (_this4.scroll - _this4.scrollTarget) * 0.1;
+        _this4.scroll *= 0.9;
+
+        _this4.thumbs.forEach(function (th) {
+          th.position.x = _this4.calcPos(_this4.scroll, th.position.x);
+        });
       });
     }
   }]);
@@ -54433,7 +54463,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60569" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63185" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

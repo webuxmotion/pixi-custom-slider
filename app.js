@@ -16,16 +16,27 @@ class Sketch {
     });
     document.body.appendChild(this.app.view);
     this.margin = 50;
+    this.scroll = 0;
+    this.scrollTarget = 0;
     this.width = (window.innerWidth - 2 * this.margin) / 3;
     this.height = window.innerHeight * 0.8;
     this.container = new PIXI.Container();
     this.app.stage.addChild(this.container);
     this.images = [t1, t2, t3, t4];
+    this.thumbs = [];
+    this.wholewidth = this.images.length * (this.width + this.margin);
 
     loadImages(this.images, (images) => {
       this.loadImages = images;
       this.add();
       this.render();
+      this.scrollEvent();
+    })
+  }
+
+  scrollEvent() {
+    document.addEventListener('mousewheel', (e) => {
+      this.scrollTarget = e.wheelDelta / 3;
     })
   }
 
@@ -73,6 +84,7 @@ class Sketch {
       container.addChild(spriteContainer);
       container.addChild(mask);
       this.container.addChild(container);
+      this.thumbs.push(container);
     })
   }
 
@@ -96,9 +108,21 @@ class Sketch {
     })
   }
 
+  calcPos(scroll, pos) {
+    let temp = (scroll + pos + this.wholewidth + this.width + this.margin) % this.wholewidth - this.width - this.margin;
+
+    return temp;
+  }
+
   render() {
     this.app.ticker.add(() => {
       this.app.renderer.render(this.container);
+
+      this.scroll -= (this.scroll - this.scrollTarget)*0.1;
+      this.scroll *= 0.9;
+      this.thumbs.forEach(th => {
+        th.position.x = this.calcPos(this.scroll, th.position.x);
+      })
     });
   }
 }
