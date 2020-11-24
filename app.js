@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import fit from 'math-fit'
+import gsap from 'gsap'
 
 import loadImages from './loadImages';
 import t1 from './1.jpg'
@@ -65,10 +66,33 @@ class Sketch {
       container.x = (this.margin + this.width) * i;
       container.y = this.height / 10;
       
-      spriteContainer.addChild(sprite)
+      spriteContainer.addChild(sprite);
+      container.interactive = true;
+      container.on('mouseover', this.mouseOn);
+      container.on('mouseout', this.mouseOut);
       container.addChild(spriteContainer);
       container.addChild(mask);
       this.container.addChild(container);
+    })
+  }
+
+  mouseOn(e) {
+    let el = e.target.children[0].children[0];
+
+    gsap.to(el.scale, {
+      duration: 0.5,
+      x: 1.2,
+      y: 1.2,
+    })
+  }
+
+  mouseOut(e) {
+    let el = e.currentTarget.children[0].children[0];
+    
+    gsap.to(el.scale, {
+      duration: 0.5,
+      x: 1,
+      y: 1,
     })
   }
 
