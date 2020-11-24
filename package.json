@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "math-fit": "^1.0.1",
+    "pixi.js": "^5.3.3"
+  }
+}
