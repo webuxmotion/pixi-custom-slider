@@ -7,6 +7,7 @@ import t1 from './1.jpg'
 import t2 from './2.jpg'
 import t3 from './3.jpg'
 import t4 from './4.jpg'
+import disp from './disp.jpg'
 
 class Sketch {
   constructor() {
@@ -31,6 +32,7 @@ class Sketch {
       this.add();
       this.render();
       this.scrollEvent();
+      this.addFilter();
     })
   }
 
@@ -38,6 +40,22 @@ class Sketch {
     document.addEventListener('mousewheel', (e) => {
       this.scrollTarget = e.wheelDelta / 3;
     })
+  }
+
+  addFilter() {
+    this.displacementSprite = PIXI.Sprite.from(disp);
+    this.app.stage.addChild(this.displacementSprite);
+
+    let target = { w: 400, h: 400 };
+    let parent = { w: window.innerWidth, h: window.innerHeight };
+    let convert = fit(target, parent);
+
+    this.displacementSprite.position.set(convert.left, convert.top);
+    this.displacementSprite.scale.set(convert.scale, convert.scale);
+    this.displacementFilter = new PIXI.filters.DisplacementFilter(this.displacementSprite);
+    this.displacementFilter.scale.x = 0;
+    this.displacementFilter.scale.y = 0;
+    this.container.filters = [this.displacementFilter];
   }
 
   add() {
@@ -118,11 +136,15 @@ class Sketch {
     this.app.ticker.add(() => {
       this.app.renderer.render(this.container);
 
+      this.direction = this.scroll > 0 ? -1 : 1;
+
       this.scroll -= (this.scroll - this.scrollTarget)*0.1;
       this.scroll *= 0.9;
       this.thumbs.forEach(th => {
         th.position.x = this.calcPos(this.scroll, th.position.x);
       })
+
+      this.displacementFilter.scale.x = 3 * this.direction * Math.abs(this.scroll);
     });
   }
 }

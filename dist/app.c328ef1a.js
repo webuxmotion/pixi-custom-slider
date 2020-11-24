@@ -54272,6 +54272,8 @@ module.exports = "/2.34f2975b.jpg";
 module.exports = "/3.a7896cd9.jpg";
 },{}],"4.jpg":[function(require,module,exports) {
 module.exports = "/4.29ff8fef.jpg";
+},{}],"disp.jpg":[function(require,module,exports) {
+module.exports = "/disp.6de2766b.jpg";
 },{}],"app.js":[function(require,module,exports) {
 "use strict";
 
@@ -54290,6 +54292,8 @@ var _2 = _interopRequireDefault(require("./2.jpg"));
 var _3 = _interopRequireDefault(require("./3.jpg"));
 
 var _4 = _interopRequireDefault(require("./4.jpg"));
+
+var _disp = _interopRequireDefault(require("./disp.jpg"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54332,6 +54336,8 @@ var Sketch = /*#__PURE__*/function () {
       _this.render();
 
       _this.scrollEvent();
+
+      _this.addFilter();
     });
   }
 
@@ -54343,6 +54349,27 @@ var Sketch = /*#__PURE__*/function () {
       document.addEventListener('mousewheel', function (e) {
         _this2.scrollTarget = e.wheelDelta / 3;
       });
+    }
+  }, {
+    key: "addFilter",
+    value: function addFilter() {
+      this.displacementSprite = PIXI.Sprite.from(_disp.default);
+      this.app.stage.addChild(this.displacementSprite);
+      var target = {
+        w: 400,
+        h: 400
+      };
+      var parent = {
+        w: window.innerWidth,
+        h: window.innerHeight
+      };
+      var convert = (0, _mathFit.default)(target, parent);
+      this.displacementSprite.position.set(convert.left, convert.top);
+      this.displacementSprite.scale.set(convert.scale, convert.scale);
+      this.displacementFilter = new PIXI.filters.DisplacementFilter(this.displacementSprite);
+      this.displacementFilter.scale.x = 0;
+      this.displacementFilter.scale.y = 0;
+      this.container.filters = [this.displacementFilter];
     }
   }, {
     key: "add",
@@ -54421,12 +54448,15 @@ var Sketch = /*#__PURE__*/function () {
       this.app.ticker.add(function () {
         _this4.app.renderer.render(_this4.container);
 
+        _this4.direction = _this4.scroll > 0 ? -1 : 1;
         _this4.scroll -= (_this4.scroll - _this4.scrollTarget) * 0.1;
         _this4.scroll *= 0.9;
 
         _this4.thumbs.forEach(function (th) {
           th.position.x = _this4.calcPos(_this4.scroll, th.position.x);
         });
+
+        _this4.displacementFilter.scale.x = 3 * _this4.direction * Math.abs(_this4.scroll);
       });
     }
   }]);
@@ -54435,7 +54465,7 @@ var Sketch = /*#__PURE__*/function () {
 }();
 
 new Sketch();
-},{"pixi.js":"node_modules/pixi.js/lib/pixi.es.js","math-fit":"node_modules/math-fit/index.js","gsap":"node_modules/gsap/index.js","./loadImages":"loadImages.js","./1.jpg":"1.jpg","./2.jpg":"2.jpg","./3.jpg":"3.jpg","./4.jpg":"4.jpg"}],"../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"pixi.js":"node_modules/pixi.js/lib/pixi.es.js","math-fit":"node_modules/math-fit/index.js","gsap":"node_modules/gsap/index.js","./loadImages":"loadImages.js","./1.jpg":"1.jpg","./2.jpg":"2.jpg","./3.jpg":"3.jpg","./4.jpg":"4.jpg","./disp.jpg":"disp.jpg"}],"../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
